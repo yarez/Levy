@@ -33,13 +33,23 @@ public class Day_Operation : MonoBehaviour {
     {
         Char_Movement_Controller curChar = Chars[charScriptInd[day, scriptCount]];
         checkFloor(curChar.ar_id, Chars);
-        while ((!curChar.getIsAlive() || curChar.did_script) && Gmanager.day < 3)
+        while ((!curChar.getIsAlive() || curChar.did_script) && Gmanager.day < 3 && scriptCount < 3)
         {
             Debug.Log("Char Dead, reselecting");
-            curChar = Chars[charScriptInd[day, ++scriptCount]];
+            
+            
+            curChar = Chars[charScriptInd[day, scriptCount]];
+            scriptCount++;
         }
-        curChar.script_char = true;
-        curChar.Ding(charScriptDest[day, scriptCount]);
+        if (scriptCount >= 3)
+        {
+            Random_Ding(Chars);
+        }
+        else
+        {
+            curChar.script_char = true;
+            curChar.Ding(charScriptDest[day, scriptCount]);
+        }
     }
 
     private int Select_Char(Char_Movement_Controller[] Chars)

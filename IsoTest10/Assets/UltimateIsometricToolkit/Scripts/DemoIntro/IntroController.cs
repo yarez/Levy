@@ -6,10 +6,15 @@ using UnityEngine;
 
 public class IntroController : MonoBehaviour {
 
+    public AudioClip loadingAudio;
+    public Texture loadingScreen;
     public Texture[] IntroImgs;
     public RawImage ConvText;
 
+    public AudioClip[] paperClips;
+
     public AudioClip Eddie_AD;
+    
     public GameObject Eddie_Front;
     public GameObject Eddie_Back;
 
@@ -22,25 +27,41 @@ public class IntroController : MonoBehaviour {
     public AudioSource music;
     bool skip = false;
     bool onAD = false;
+    bool paperPlaying;
 
     public GameObject NewsPaper;
 
 	// Use this for initialization
 	void Start () {
         NewsPaper.SetActive(true);
-        StartCoroutine(initIntro());
+        StartCoroutine(paperAD());
     }
 	
-    IEnumerator initIntro()
+    IEnumerator paperAD()
     {
+        paperPlaying = true;
         canAdvance = false;
         Eddie_Back.SetActive(false);
         Eddie_Front.SetActive(false);
-        while (!Input.GetButtonDown("Open") && !Input.GetMouseButtonDown(0))
-        {
-            yield return null;
+        int i = 0;
+        while(i < paperClips.Length) { 
+            AD_Container.Stop();
+            AD_Container.clip = paperClips[i];
+            AD_Container.Play();
+            while (!Input.GetButtonDown("Open") && AD_Container.isPlaying)
+            {
+                yield return null;
+            }
+            yield return new WaitForEndOfFrame();
+            i++;
         }
         NewsPaper.SetActive(false);
+        StartCoroutine(initIntro());
+    }
+    
+    IEnumerator initIntro()
+    {
+        paperPlaying = false;
         AD_Container.clip = Eddie_AD;
         AD_Container.Play();
         yield return new WaitForSeconds(2f);
@@ -69,7 +90,7 @@ public class IntroController : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-		if (Input.GetButtonDown("Open") && canAdvance)
+		if (Input.GetButtonDown("Open") && canAdvance && !paperPlaying)
         {
             index++;
             if (index < 7)
@@ -79,7 +100,7 @@ public class IntroController : MonoBehaviour {
             {
                 StartCoroutine(eddieDeath());
             }
-        }else if(Input.GetButtonDown("Open") && onAD)
+        }else if(Input.GetButtonDown("Open") && onAD && !paperPlaying)
         {
             skip = true;
         }
@@ -105,6 +126,10 @@ public class IntroController : MonoBehaviour {
         deathSound1.Play();
         yield return new WaitForSeconds(1.25f);
         deathSound2.Play();
+        yield return new WaitForSeconds(1f);
+        ConvText.texture = loadingScreen;
+        AD_Container.clip = loadingAudio;
+        AD_Container.Play();
         SceneManager.LoadScene("LevyGame", LoadSceneMode.Single);
     }
 }

@@ -27,12 +27,18 @@ public class Char_Movement_Controller : MonoBehaviour
     public Texture No_Thanks;
     public Texture[] toFloorTexts;
     public AudioClip[] toFloorAud;
-    public AudioSource toFloorContainer;
     public Sprite[] Char_Sprites;
     public SpriteRenderer Char_Floor;
     public AudioSource deathSound;
-    public AudioSource A_Thanks;
-    public AudioSource A_No_Thanks;
+    public AudioSource AD_Container;
+    public AudioClip[] dingClips;
+    public ConversationEngine CEngine;
+
+    public AudioClip A_Thanks;
+    public AudioClip A_NoThanks;
+
+
+    public bool isMinnie; //never do this
 
     private IsoTransform Elev_Iso;
     public bool onElev = false;
@@ -45,6 +51,9 @@ public class Char_Movement_Controller : MonoBehaviour
     public bool did_script = false;
     public bool script_char = false;
     private bool canEnter = true;
+    public bool canMove = true;
+
+    public int debugFloor;
 
 
     void Start()
@@ -59,8 +68,10 @@ public class Char_Movement_Controller : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        debugFloor = getFloor();
+
         //Get in the elevator
-        if (Input.GetButtonDown("Open") && !onElev && !Elev.getOpen() && ding && canEnter)
+        if (Input.GetButtonDown("Open") && !onElev && !Elev.getOpen() && ding && canEnter && !CEngine.convActive)
         {
             y = AStarLevels[Elev.getFloor() - 1];
             if (Mathf.Abs(_isoTransform.Position.y - Elev_Iso.Position.y) < 2)
@@ -68,7 +79,7 @@ public class Char_Movement_Controller : MonoBehaviour
                 StopAllCoroutines();
                 StartCoroutine(moveIn(y));
             }
-        }else if (Input.GetButtonDown("Open") && onElev && !Elev.getOpen())
+        }else if (Input.GetButtonDown("Open") && onElev && !Elev.getOpen() && !CEngine.convActive)
         {
             y = AStarLevels[Elev.getFloor() - 1];
             StopAllCoroutines();
@@ -79,10 +90,10 @@ public class Char_Movement_Controller : MonoBehaviour
 
     IEnumerator moveRandom(float y)
     {
-        while(true){
+        while(canMove){
             if (!ding)
             {
-                Vector3 dest = new Vector3(Random.Range(1, 12), y, Random.Range(1, 12));
+                Vector3 dest = new Vector3(Random.Range(1, 10), y, Random.Range(1, 10));
                 setSprite(dest);
                 AstarAgent.MoveTo(dest);
             }
@@ -99,8 +110,8 @@ public class Char_Movement_Controller : MonoBehaviour
         DingLights[getFloor() - 1].SetActive(false);
         D_Text.color = new Color(255, 255, 255, 255);
         D_Text.texture = (Texture)toFloorTexts[toFloor-1];
-        toFloorContainer.clip = toFloorAud[toFloor - 1];
-        toFloorContainer.Play();
+        AD_Container.clip = toFloorAud[toFloor - 1];
+        AD_Container.Play();
     }
 
     IEnumerator moveToLevy(float y, int dest)
@@ -114,13 +125,22 @@ public class Char_Movement_Controller : MonoBehaviour
         AstarAgent.MoveTo(dest1);
         yield return new WaitForSeconds(time);
         ding = true;
+        while (CEngine.convActive)
+        {
+            yield return null;
+        }
+        AD_Container.clip = dingClips[getFloor() - 1];
+        AD_Container.Play();
         DingLights[getFloor() - 1].SetActive(true);
         dingSound.Play();
         toFloor = dest;
+        //yield return new WaitForEndOfFrame();
+        //AD_Container.clip = null;
     }
 
     IEnumerator moveOut(float y)
     {
+        
         AstarAgent.transform.position = Isometric.IsoToUnitySpace(new Vector3(5f, Elev_Iso.Position.y, 1f));
         _isoTransform.Position = Isometric.UnityToIsoSpace(AstarAgent.transform.position);
         SpriteRenderer spriteRender = (SpriteRenderer)AstarAgent.GetComponent("SpriteRenderer");
@@ -128,12 +148,15 @@ public class Char_Movement_Controller : MonoBehaviour
         Char_Elev.sprite = null;
         onElev = false;
         canEnter = false;
-        if(Mathf.Abs(_isoTransform.Position.y - AStarLevels[toFloor - 1]) < 10)
+        yield return new WaitForEndOfFrame();
+        ConvDecider.convActive = true;
+        if (Mathf.Abs(_isoTransform.Position.y - AStarLevels[toFloor - 1]) < 10)
         {
             Debug.Log("Thanks!");
             D_Text.color = new Color(255, 255, 255, 255);
             D_Text.texture = (Texture)Thanks;
-            A_Thanks.Play();
+            AD_Container.clip = A_Thanks;
+            AD_Container.Play();
             if (script_char)
                 did_script = true;
             GManager.addSat();
@@ -147,7 +170,8 @@ public class Char_Movement_Controller : MonoBehaviour
             Debug.Log("Wait, what?");
             D_Text.color = new Color(255, 255, 255, 255);
             D_Text.texture = (Texture)No_Thanks;
-            A_No_Thanks.Play();
+            AD_Container.clip = A_NoThanks;
+            AD_Container.Play();
             GManager.subSat();
             yield return new WaitForSeconds(2f);
             DingText.text = "";
@@ -160,6 +184,7 @@ public class Char_Movement_Controller : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
         int floor = getFloor();
         Vector3 convTarget = ConvDecider.conversationTree(ar_id, floor);
+
         if (convTarget.x > 0)
         {
             Vector3 dest = convTarget + new Vector3(1, 0, 0);
@@ -168,6 +193,7 @@ public class Char_Movement_Controller : MonoBehaviour
             Debug.Log("Conversation");
         }else
         {
+            ConvDecider.convActive = false;
             Vector3 dest = new Vector3(Random.Range(1, 12), y, Random.Range(1, 12));
             setSprite(dest);
             AstarAgent.MoveTo(dest);
@@ -209,7 +235,7 @@ public class Char_Movement_Controller : MonoBehaviour
         StopAllCoroutines();
     }
 
-    private void setSprite(Vector3 dest)
+    public void setSprite(Vector3 dest)
     {
         Vector3 initPos = this._isoTransform.Position;
         Vector3 dir = dest - initPos;
@@ -234,5 +260,15 @@ public class Char_Movement_Controller : MonoBehaviour
                 Char_Floor.sprite = Char_Sprites[3];
             }
         }
+    }
+
+    public void manSetSprite(int num)
+    {
+        Char_Floor.sprite = Char_Sprites[num];
+    }
+
+    public void startMoving()
+    {
+        StartCoroutine(moveRandom(y));
     }
 }

@@ -18,10 +18,12 @@ public class ConversationEngine : MonoBehaviour {
     private AudioClip[] A_convSet;
     public AudioSource A_Container;
     public JamesController james;
+    public MinnieController minnie;
     private int index = 0;
     public bool convActive = false;
     public bool canAdvance = true;
     public int LocIndex;
+    public FloorDescription AD_Floor;
 
     // Use this for initialization
     void Start () {
@@ -30,13 +32,18 @@ public class ConversationEngine : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        if(james.speaking || minnie.speaking || AD_Floor.playing)
+        {
+            convActive = true;
+        }
+
 		if (convSet != null && convActive && ConvText.texture != null && Input.GetButtonDown("Open") && index < 4 && canAdvance)
         {
-            StartCoroutine(SwapThrough());
-            
+            StartCoroutine(SwapThrough());    
         }else if (convSet != null && index >= convSet.Length && !james.speaking)
         {
             index = 0;
+            convSet = null;
             A_Container.Stop();
             A_Container.clip = null;
             ConvText.color = new Color(255, 255, 255, 0);
@@ -50,13 +57,14 @@ public class ConversationEngine : MonoBehaviour {
         int day = Gmanager.day;
         int partner = findConvPartner(ar_id, day, floor);
         bool isOnFloor = checkFloor(partner, floor);
+        bool isAlive = Gmanager.Chars[Gmanager.Reaper(day - 1)].isAlive;
+        ConvText.texture = null;
 
-        if(!isOnFloor && floor == 1)
+        if (!isOnFloor && floor == 1)
         {
-            bool isAlive = Gmanager.Chars[Gmanager.Reaper(day - 1)].isAlive;
             james.runLine(Gmanager.day, isAlive);
         }
-        if (isOnFloor)
+        if (isOnFloor && isAlive)
         {
 
             Gmanager.Chars[partner].stopMoving();
@@ -179,7 +187,7 @@ public class ConversationEngine : MonoBehaviour {
         if (target < 10)
         {
             Char_Movement_Controller targetChar = Gmanager.Chars[target];
-            if (targetChar.getFloor() == floor)
+            if (targetChar.getFloor() == floor && targetChar.isAlive)
             {
                 return true;
             }else
@@ -195,10 +203,11 @@ public class ConversationEngine : MonoBehaviour {
         convSet = ConvSelector.Select(day, char1, char2);
         A_convSet = ConvSelector.SelectAudio(day, char1, char2);
         if(convSet != null) {
-            ConvText.color = new Color(255, 255, 255, 255);
             ConvText.texture = (Texture)convSet[0];
             A_Container.clip = A_convSet[0];
             A_Container.Play();
+            ConvText.color = new Color(255, 255, 255, 255);
+            Debug.Log("Hi COnv");
             convActive = true;
         }else
         {
@@ -222,5 +231,17 @@ public class ConversationEngine : MonoBehaviour {
         yield return new WaitForSeconds(0.5f);
         convActive = false;
         canAdvance = true;
+    }
+
+    public void disable()
+    {
+        convActive = false;
+        Debug.Log("Disable");
+    }
+
+    public void clearText()
+    {
+        ConvText.color = new Color(255, 255, 255, 0);
+        ConvText.texture = null;
     }
 }

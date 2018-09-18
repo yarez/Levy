@@ -303,7 +303,7 @@ AudioSource:
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 4
+    m_RotationOrder: 0
   reverbZoneMixCustomCurve:
     serializedVersion: 2
     m_Curve:
@@ -932,6 +932,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0365c67f46505844d85f37116319667f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  loadingAudio: {fileID: 8300000, guid: bc4046604448d644db735031cb110c30, type: 3}
+  loadingScreen: {fileID: 2800000, guid: 07e9ad26a1c0dac418591cb3e5b7ca26, type: 3}
   IntroImgs:
   - {fileID: 2800000, guid: de7e449e471771e49b927b41cb05c407, type: 3}
   - {fileID: 2800000, guid: a6e64b3fc6aca874cbac90b665ed6d2e, type: 3}
@@ -942,6 +944,13 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 2c932148d4a139c48971f09ae71f681e, type: 3}
   - {fileID: 2800000, guid: 227b0cccf3586dc448b02fb6b890cf9c, type: 3}
   ConvText: {fileID: 102536717}
+  paperClips:
+  - {fileID: 8300000, guid: 99f02f795975be34d91402af6988ac86, type: 3}
+  - {fileID: 8300000, guid: dde172df8672d3c4fb2730133d35aa45, type: 3}
+  - {fileID: 8300000, guid: 079f196e94c5af940a4622480a716a66, type: 3}
+  - {fileID: 8300000, guid: ce04e321c7fe83844b225f8128958a12, type: 3}
+  - {fileID: 8300000, guid: 8207c26cc9420504e98447cc042b7cee, type: 3}
+  - {fileID: 8300000, guid: 58ff744b05f77444badecd6b08efded6, type: 3}
   Eddie_AD: {fileID: 8300000, guid: 0e35828ca48e90546b4c58ef175fd1d0, type: 3}
   Eddie_Front: {fileID: 1890497101}
   Eddie_Back: {fileID: 1878608392}

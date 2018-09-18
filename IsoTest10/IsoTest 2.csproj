@@ -75,6 +75,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\UltimateIsometricToolkit\Scripts\AudioDescribe\FloorDescription.cs" />
+    <Compile Include="Assets\UltimateIsometricToolkit\Scripts\AudioDescribe\FloorTrigger.cs" />
+    <Compile Include="Assets\UltimateIsometricToolkit\Scripts\AudioDescribe\StatusUpdate.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\Core\DependencySorting.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\Core\HeuristicSorting.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\Core\IsoSorting.cs" />
@@ -90,11 +93,13 @@
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\External\ExposePropertyAttribute.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\External\LinqExtensions.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\External\PinchZoom.cs" />
+    <Compile Include="Assets\UltimateIsometricToolkit\Scripts\GameState\ConfessionEngine.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\GameState\ConvSetSelector.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\GameState\ConversationEngine.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\GameState\Day_Operation.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\GameState\DeathProps.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\GameState\GameManager.cs" />
+    <Compile Include="Assets\UltimateIsometricToolkit\Scripts\GameState\GameOverManager.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\GameState\Loader.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\GameState\PauseGame.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\GameState\StartManager.cs" />
@@ -103,6 +108,7 @@
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\IsoController\Elev_DoorController.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\IsoController\JamesController.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\IsoController\JamesSelector.cs" />
+    <Compile Include="Assets\UltimateIsometricToolkit\Scripts\IsoController\MinnieController.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\IsoController\SimpleIsoObjectController.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\Pathfinding\Astar.cs" />
     <Compile Include="Assets\UltimateIsometricToolkit\Scripts\Pathfinding\AstarAgent.cs" />
